@@ -1,0 +1,245 @@
+<html>
+<head>
+    <link rel="stylesheet" href="css/reveal.css">
+    <link rel="stylesheet" href="css/theme/moon.css">
+</head>
+<body>
+<div class="reveal">
+    <div class="slides">
+        <section data-markdown>
+            ## Concurrency
+            ### Tackling Concurrency Without Threads
+            #### Siva Kommuri / June 22, 2016
+        </section>
+        <section data-markdown>
+            ## Overview
+            * Introduction
+            * Traditional Concurrency Model
+                * Pitfalls of Traditional Concurrency Model
+                * Updated JDK API
+            * Dealing With State
+                * Three different types of dealing with state
+            * Resources
+            * Questions
+
+            Note:
+            * Not a session about how to program concurrency
+            * Take bigger picture
+            * Will give pointers and introduce new techniques / technologies
+                * Some models which will allow you to tackle multithreading models
+                * Hopefully, you will keep some of the points when writing your next Java method
+                * Resources section
+        </section>
+        <section data-markdown>
+            ## Introduction
+            * Single thread, single execution flow
+                * Underutilizes the multi core processors
+            * We want to increase the efficiency of the overall process by making them parallel tasks
+        </section>
+        <section data-markdown>
+            <section data-markdown>
+                ## Introduction
+
+                ### Benefits
+                * Makes apps more responsive
+                * Reduce latency
+                * Increase throughput
+            </section>
+            <section data-markdown>
+                ## Introduction
+                ### Limitations
+                * Starvation
+                * Deadlock
+                * Race Conditions
+
+                Note:
+                * Starvation
+                * MySQL Thread Pool
+                * Application asks for confirmation before performing a critical task
+                * Thread is dependent on external event to occur or for another thread to release the lock
+                * Timeouts
+                * Deadlock
+                * Timeouts doesn’t help – just a programmer error
+                * Race Conditions
+                * Two threads competing to use the same resource or data
+            </section>
+        </section>
+        <section data-markdown>
+            <section data-markdown>
+                ## Traditional Concurrency Model
+                * Threads are not reused as they don’t allow restart
+                    * So, we create multiple threads
+                * Scheduling multiple tasks on a thread
+                    * Write quite a bit of extra code
+                * `wait()` and `notify()` require synchronization
+                * `join()` cares about the death of the thread rather than a task being accomplished
+                * `synchronized` lacks granularity
+                    * No time out
+                * Very difficult to unit test for thread safety
+            </section>
+            <section data-markdown>
+                ## Traditional Concurrency Model
+                * Instead of using `Thread` class and its methods
+                    * Use `ExecutorService` class and related classes
+                * To acquire locks, use `Lock` interface and its methods
+                * Instead of using `wait` / `notify`
+                    * Use synchronizers such as CyclicBarrier and CountdownLatch
+                * Spend some time with java.util.concurrent package
+                    * Lot has changed!
+
+                Note:
+                Use higher level APIs rather than lower level `Thread` class
+            </section>
+        </section>
+        <section data-markdown>
+            <section data-markdown>
+                ## Dealing With State
+                * Shared Mutability
+                * Isolated Mutability
+                * Pure Immutability
+
+                ## Total Age Of The Group
+            </section>
+            <section data-markdown>
+                ## Dealing With State
+                ### Shared Mutability - Total Age Of The Group
+                * Algorithm
+                    * I write 0 on the blackboard
+                    * Everyone has to come up and add their age to the current value
+                * Salient Points
+                    * Watch out for somebody making the wrong calculation
+                    * Line of people waiting for their turn to write their age
+                * Programming Terms
+                    * Safeguard against a rogue thread which will ruin the calculation
+                    * Blocking threads
+                    * High thread safety
+                    * Low concurrency
+            </section>
+            <section data-markdown>
+                ## Dealing With State
+                ### Isolated Mutability - Total Age Of The Group
+                * Algorithm
+                    * Everybody sends me a text message with their age
+                * Salient Points
+                    * Nobody has to wait
+                        * Senders are concurrent and non-blocking
+                    * The mutable value which is the total age is isolated
+                        * Only I hold the value, nobody else has access to that value
+                    * Cell phone carrier took care of the concurrency for me
+                * Programming Terms
+                    * Every person including myself was a thread (actor)
+                    * The message itself was immutable, I only get a copy of the message.
+                    * Values within the actor are isolated and cannot be viewed by other actors
+                    * No need to worry about synchronization
+            </section>
+            <section data-markdown>
+                ## Dealing With State
+                ### Pure Immutability - Total Age Of The Group
+                * Algorithm
+                    * Everyone sits in a circle
+                    * First person will tell her age to the person sitting on the left
+                    * Second person will total his age to the value given
+                    * Then, give the new total to the person sitting on the left
+                    * Repeat until all people have been processed
+                * Salient Points
+                    * Nobody has changed any value
+                    * Large groups of people can be partitioned into smaller groups (MapReduce approach)
+                * Programming Terms
+                    * Very common in functional languages such as Scala, Clojure, Groovy, and JRuby
+                    * Different programming paradigm
+                    * Algorithms need to favor immutability, apply recursive structure / functional composition, and utilize persistent data structures.
+
+                Notes:
+                * Nobody has changed any value
+                * Every person had a new partial total and created a new total
+                * Old values were discarded
+
+                * Recursion was tough for me
+            </section>
+            <section data-markdown>
+                ## Dealing With State
+                * How would a wiki page be collaborated?
+                    * Shared Mutability
+                    * Isolated Mutability
+                    * Pure Immutability
+
+                Note:
+                * Single wiki page needs to be collaborated
+                    * Shared Mutability – Single page
+                    * Isolated Mutability – Different sections of the page are given to different people. Section when completed is given to a co-ordinator who will guard the final page.
+                    * Pure Immutability – Single page, but a sequential chain of people are working on the page
+            </section>
+        </section>
+
+
+        <section>Introduction</section>
+        <section>
+            Single Horizontal Slide
+            <aside class="notes">
+                Oh hey, these are some notes. They'll be hidden in your presentation, but you can see them if you open
+                the speaker notes window (hit 's' on your keyboard).
+            </aside>
+        </section>
+        <section>
+            <section>Vertical Slide 1</section>
+            <section>Vertical Slide 2</section>
+        </section>
+        <section data-markdown>
+            <script type="text/template">
+                Markdown
+                ## Page title
+
+                A paragraph with some text and a [link](http://hakim.se).
+
+                Note:
+                This will only display in the notes window.
+            </script>
+        </section>
+        <section>Slide 2</section>
+    </div>
+</div>
+<script src="lib/js/head.min.js"></script>
+<script src="js/reveal.js"></script>
+
+<script>
+
+    // More info https://github.com/hakimel/reveal.js#configuration
+    Reveal.initialize({
+        controls: true,
+        progress: true,
+        history: true,
+        center: true,
+
+        transition: 'slide', // none/fade/slide/convex/concave/zoom
+
+        // More info https://github.com/hakimel/reveal.js#dependencies
+        dependencies: [
+            {
+                src: 'lib/js/classList.js', condition: function () {
+                return !document.body.classList;
+            }
+            },
+            {
+                src: 'plugin/markdown/marked.js', condition: function () {
+                return !!document.querySelector('[data-markdown]');
+            }
+            },
+            {
+                src: 'plugin/markdown/markdown.js', condition: function () {
+                return !!document.querySelector('[data-markdown]');
+            }
+            },
+            {
+                src: 'plugin/highlight/highlight.js', async: true, callback: function () {
+                hljs.initHighlightingOnLoad();
+            }
+            },
+            {src: 'plugin/zoom-js/zoom.js', async: true},
+            {src: 'plugin/notes/notes.js', async: true},
+            {src: 'socket.io/socket.io.js', async: true},
+            {src: 'plugin/notes-server/client.js', async: true}
+        ]
+    });
+</script>
+</body>
+</html>
