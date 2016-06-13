@@ -1,7 +1,37 @@
 <html>
 <head>
+    <meta charset="utf-8">
+
+    <title>Concurrency – Tackling Concurrency Without Threads</title>
+
+    <meta name="description" content="Concurrency">
+    <meta name="author" content="Siva Kommuri">
+
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <link rel="stylesheet" href="css/reveal.css">
+    <link rel="stylesheet" href="css/theme/black.css" id="theme">
+
     <link rel="stylesheet" href="css/reveal.css">
     <link rel="stylesheet" href="css/theme/moon.css">
+    <!-- Theme used for syntax highlighting of code -->
+    <link rel="stylesheet" href="lib/css/zenburn.css">
+
+    <!-- Printing and PDF exports -->
+    <script>
+        var link = document.createElement( 'link' );
+        link.rel = 'stylesheet';
+        link.type = 'text/css';
+        link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+        document.getElementsByTagName( 'head' )[0].appendChild( link );
+    </script>
+
+    <!--[if lt IE 9]>
+    <script src="lib/js/html5shiv.js"></script>
+    <![endif]-->
 </head>
 <body>
 <div class="reveal">
@@ -58,7 +88,7 @@
                 * Thread is dependent on external event to occur or for another thread to release the lock
                 * Timeouts
                 * Deadlock
-                * Timeouts doesn’t help – just a programmer error
+                * Timeouts doesn't help – just a programmer error
                 * Race Conditions
                 * Two threads competing to use the same resource or data
             </section>
@@ -66,7 +96,7 @@
         <section>
             <section data-markdown>
                 ## Traditional Concurrency Model
-                * Threads are not reused as they don’t allow restart
+                * Threads are not reused as they don't allow restart
                     * So, we create multiple threads
                 * Scheduling multiple tasks on a thread
                     * Write quite a bit of extra code
@@ -82,8 +112,8 @@
                     * Use `ExecutorService` class and related classes
                 * To acquire locks, use `Lock` interface and its methods
                 * Instead of using `wait` / `notify`
-                    * Use synchronizers such as CyclicBarrier and CountdownLatch
-                * Spend some time with java.util.concurrent package
+                    * Use synchronizers such as `CyclicBarrier` and `CountdownLatch`
+                * Spend some time with `java.util.concurrent` package
                     * Lot has changed!
 
                 Note:
@@ -96,11 +126,12 @@
                 * Shared Mutability
                 * Isolated Mutability
                 * Pure Immutability
-
-                ## Total Age Of The Group
             </section>
             <section data-markdown>
-                ## Dealing With State
+                ## Total Age Of The Group
+                * Every person including myself was a thread (actor)
+            </section>
+            <section data-markdown>
                 ### Shared Mutability - Total Age Of The Group
                 * Algorithm
                     * I write 0 on the blackboard
@@ -115,45 +146,45 @@
                     * Low concurrency
             </section>
             <section data-markdown>
-                ## Dealing With State
                 ### Isolated Mutability - Total Age Of The Group
                 * Algorithm
                     * Everybody sends me a text message with their age
                 * Salient Points
-                    * Nobody has to wait
-                        * Senders are concurrent and non-blocking
+                    * Senders are concurrent and non-blocking
                     * The mutable value which is the total age is isolated
-                        * Only I hold the value, nobody else has access to that value
                     * Cell phone carrier took care of the concurrency for me
                 * Programming Terms
-                    * Every person including myself was a thread (actor)
-                    * The message itself was immutable, I only get a copy of the message.
+                    * I only get a copy of the message - making `message` immutable
                     * Values within the actor are isolated and cannot be viewed by other actors
                     * No need to worry about synchronization
+
+                Note:
+                * Nobody has to wait
+                * Only I hold the value, nobody else has access to that value
             </section>
             <section data-markdown>
-                ## Dealing With State
                 ### Pure Immutability - Total Age Of The Group
                 * Algorithm
-                    * Everyone sits in a circle
-                    * First person will tell her age to the person sitting on the left
-                    * Second person will total his age to the value given
-                    * Then, give the new total to the person sitting on the left
-                    * Repeat until all people have been processed
+                    * Everyone sits in a circle.
+                    * First person will tell her age to the person sitting on the left.
+                    * Second person will total his age and give new total to the next person and so on.
+            </section>
+            <section data-markdown>
+                ### Pure Immutability - Total Age Of The Group
                 * Salient Points
-                    * Nobody has changed any value
-                    * Large groups of people can be partitioned into smaller groups (MapReduce approach)
+                    * Nobody has changed any value.
+                    * Large groups of people can be partitioned into smaller groups (MapReduce approach).
                 * Programming Terms
-                    * Very common in functional languages such as Scala, Clojure, Groovy, and JRuby
-                    * Different programming paradigm
+                    * Very common in functional languages such as Scala, Clojure, Groovy, and JRuby.
+                    * Different programming paradigm.
                     * Algorithms need to favor immutability, apply recursive structure / functional composition, and utilize persistent data structures.
 
-                Notes:
-                * Nobody has changed any value
-                * Every person had a new partial total and created a new total
-                * Old values were discarded
-
-                * Recursion was tough for me
+                Note:
+                * Nobody has changed any value.
+                * Every person had a new partial total and created a new total.
+                * Old values were discarded.
+                * Cell phone carrier took care of the concurrency for me
+                * Recursion was tough for me.
             </section>
             <section data-markdown>
                 ## Dealing With State
@@ -171,12 +202,12 @@
         </section>
         <section>
             <section data-markdown>
-                ## Shared Mutability
+                ## Shared Mutability - Memory Barrier
                 * Copying from local / working memory (registers / caches) to main memory
                     * Write has to happen before the read
                     * Writing thread has to cross the memory barrier before the reading thread
                 * APIs which force crossing the memory barrier
-                    * `synchronized` / `volatile` keywords force – changes to be globally visible
+                    * `synchronized` / `volatile` keywords force changes to be globally visible
                     * Methods such as `Thread.start()` and `Threads.interrupt()`
                     * `ExecutorService`
                     * `CountdownLatch`
@@ -186,33 +217,17 @@
                     * Threads from constructors forces memory barrier because start() is called.
             </section>
             <section data-markdown>
-                ## Shared Mutability
-                ### Memory Barrier
-                * Copying from local / working memory (registers / caches) to main memory
-                    * Write has to happen before the read
-                    * Writing thread has to cross the memory barrier before the reading thread
-                * APIs which force crossing the memory barrier
-                    * `synchronized` / `volatile` keywords force – changes to be globally visible
-                    * Methods such as `Thread.start()` and `Threads.interrupt()`
-                    * `ExecutorService`
-                    * `CountdownLatch`
-                    
-                Note: 
-                * Memory Barrier
-                    * Threads from constructors forces memory barrier because start() is called.
-            </section>
-            <section data-markdown>
-                ## Shared Mutability
-                ### Concerns
+                ## Shared Mutability - Concerns
                 * Not restricted to public fields
                     * Shared variable is accessed, for read or write, by more than one thread.
                 * Common mistakes
-                    * Don’t create threads from within constructors; instead, create them in static factory methods.
+                    * Create threads in static factory methods.
+                    * Don't create threads from within constructors; instead, create them in static factory methods.
                         * Exposes partially created objects to other threads.
-                    * Don’t create arbitrary threads; instead use a pool of threads to reduce the tasks startup time and resource use.
+                    * Don't create arbitrary threads; instead use a pool of threads to reduce the tasks startup time and resource use.
                     * Ensure that access to mutable fields cross **memory barrier** and are visible to threads properly.
                     * Evaluate the granularity of locks and promote concurrency to be at the right level.
-                    * When working with multiple mutable fields, verify that the access to these variables is atomic; that is other threads don’t see partial changes to these fields.
+                    * When working with multiple mutable fields, verify that the access to these variables is atomic; that is other threads don't see partial changes to these fields.
                     
                 Note:
                 * Threads from constructors forces memory barrier because start() is called.                
@@ -249,7 +264,7 @@
                 * Consistency
                     * Transactions complete till the end. Other transactions will consistently see one change after the other.
                 * Isolation
-                    * Transactions don’t see partial changes of other transactions but only after a transaction is completed.
+                    * Transactions don't see partial changes of other transactions but only after a transaction is completed.
             </section>
             <section data-markdown>
                 ## Shared Mutability
@@ -275,7 +290,7 @@
                 * JDK Threading API
                 * Software Transactional Memory (STM)
                     * Still painful
-                    * Doesn’t manage mutable variables for you
+                    * Doesn't manage mutable variables for you
                 * Event-Based Message Passing
             </section>
             <section data-markdown>
@@ -312,31 +327,31 @@
             </section>
         </section>
         <section>
-            <section data-markdown>
-                ## Pure Immutability
-                ### Java Code
+            <section>
+                <h2>Pure Immutability</h2>
+                <h3>Java Code</h3>
                 <pre>
-                    <code data-trim data-noescape>
-                        public static int findMax(List<Integer> temperatures) {
-                            int highTemperature = Integer.MIN_VALUE;
-                            for (int temperature: temperatures) {
-                                highTemperature = Math.max(highTemperature, temperature);
-                            }
-                            return highTemperature;
-                        }
+                    <code class="hljs"  data-trim data-noescape>
+public static int findMax(List<Integer> temperatures) {
+    int highTemperature = Integer.MIN_VALUE;
+    for (int temperature: temperatures) {
+        highTemperature = Math.max(highTemperature, temperature);
+    }
+    return highTemperature;
+}
                     </code>
                 </pre>
             </section>
-            <section data-markdown>
-                ## Pure Immutability
-                ### Scala Code
+            <section>
+                <h2>Pure Immutability<h2>
+                <h3>Scala Code</h3>
                 <pre>
                     <code data-trim data-noescape>
-                        def findMax(temperatures: List[Int]) = {
-                          temperatures.foldLeft(Integer.MIN_VALUE)((min, x) => {
-                            Math.max(min, x)
-                          })
-                        }
+def findMax(temperatures: List[Int]) = {
+  temperatures.foldLeft(Integer.MIN_VALUE)((min, x) => {
+    Math.max(min, x)
+  })
+}
                     </code>
                 </pre>
             </section>
@@ -351,16 +366,14 @@
                           })
                         }
 
-                        def findMax(temperatures: List[Int]) =
-                          temperatures.foldLeft(Integer.MIN_VALUE)(
-                            Math.max)
+                        def findMax(temperatures: List[Int]) = temperatures.foldLeft(Integer.MIN_VALUE)(Math.max)
                     </code>
-                    
-                    Note:
-                    * No semicolons, no parenthesis-es
-                    * Return data type is inferred
-                    * `temperatures` can't be reassigned. It's immutable.
                 </pre>
+
+                Note:
+                * No semicolons, no parenthesis-es
+                * Return data type is inferred
+                * `temperatures` can't be reassigned. It's immutable.
             </section>
             <section data-markdown>
                 ## Pure Immutability
@@ -377,8 +390,9 @@
                           .grouped(16)
                           .foreach(sendCardBatch)
                     </code>
-                    Reference: http://swave.io/scalar/#/3
                 </pre>
+
+                Reference: http://swave.io/scalar/#/3
             </section>
         </section>
         <section data-markdown>
@@ -444,9 +458,14 @@
     // More info https://github.com/hakimel/reveal.js#configuration
     Reveal.initialize({
         controls: true,
-        progress: true,
+        progress: false,
         history: true,
         center: true,
+        width: 1500,
+        height: 900,
+        margin: 0.1,
+        minScale: 0.01,
+        maxScale: 1.5,
 
         transition: 'slide', // none/fade/slide/convex/concave/zoom
 
