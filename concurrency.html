@@ -1,0 +1,513 @@
+<html>
+<head>
+    <meta charset="utf-8">
+
+    <title>Concurrency – Tackling Concurrency Without Threads</title>
+
+    <meta name="description" content="Concurrency">
+    <meta name="author" content="Siva Kommuri">
+
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <link rel="stylesheet" href="css/reveal.css">
+    <link rel="stylesheet" href="css/theme/black.css" id="theme">
+
+    <link rel="stylesheet" href="css/reveal.css">
+    <link rel="stylesheet" href="css/theme/moon.css">
+    <!-- Theme used for syntax highlighting of code -->
+    <link rel="stylesheet" href="lib/css/zenburn.css">
+
+    <!-- Printing and PDF exports -->
+    <script>
+        var link = document.createElement( 'link' );
+        link.rel = 'stylesheet';
+        link.type = 'text/css';
+        link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+        document.getElementsByTagName( 'head' )[0].appendChild( link );
+    </script>
+
+    <!--[if lt IE 9]>
+    <script src="lib/js/html5shiv.js"></script>
+    <![endif]-->
+</head>
+<body>
+<div class="reveal">
+    <div class="slides">
+        <section data-markdown>
+            ## Concurrency
+            ### Tackling Concurrency Without Threads
+            #### Siva Kommuri / June 22, 2016
+        </section>
+        <section data-markdown>
+            ## Overview
+            * Introduction
+            * Traditional Concurrency Model
+                * Pitfalls of Traditional Concurrency Model
+                * Updated JDK API
+            * Dealing With State
+                * Three different types of dealing with state
+            * Resources
+            * Questions
+
+            Note:
+            * Not a session about how to program concurrency
+            * Take bigger picture
+            * Will give pointers and introduce new techniques / technologies
+                * Some models which will allow you to tackle multithreading models
+                * Hopefully, you will keep some of the points when writing your next Java method
+                * Resources section
+        </section>
+        <section data-markdown>
+            ## Introduction
+            * Single thread, single execution flow
+                * Underutilizes the multi core processors
+            * We want to increase the efficiency of the overall process by making them parallel tasks
+        </section>
+        <section>
+            <section data-markdown>
+                ## Introduction
+                ### Benefits
+                * Makes apps more responsive
+                * Reduce latency
+                * Increase throughput
+            </section>
+            <section data-markdown>
+                ## Introduction
+                ### Limitations
+                * Starvation
+                * Deadlock
+                * Race Conditions
+
+                Note:
+                * Starvation
+                * MySQL Thread Pool
+                * Application asks for confirmation before performing a critical task
+                * Thread is dependent on external event to occur or for another thread to release the lock
+                * Timeouts
+                * Deadlock
+                * Timeouts doesn't help – just a programmer error
+                * Race Conditions
+                * Two threads competing to use the same resource or data
+            </section>
+        </section>
+        <section>
+            <section data-markdown>
+                ## Traditional Concurrency Model
+                * Threads are not reused as they don't allow restart
+                    * So, we create multiple threads
+                * Scheduling multiple tasks on a thread
+                    * Write quite a bit of extra code
+                * `wait()` and `notify()` require synchronization
+                * `join()` cares about the death of the thread rather than a task being accomplished
+                * `synchronized` lacks granularity
+                    * No time out
+                * Very difficult to unit test for thread safety
+            </section>
+            <section data-markdown>
+                ## Traditional Concurrency Model
+                * Instead of using `Thread` class and its methods
+                    * Use `ExecutorService` class and related classes
+                * To acquire locks, use `Lock` interface and its methods
+                * Instead of using `wait` / `notify`
+                    * Use synchronizers such as `CyclicBarrier` and `CountdownLatch`
+                * Spend some time with `java.util.concurrent` package
+                    * Lot has changed!
+
+                Note:
+                Use higher level APIs rather than lower level `Thread` class
+            </section>
+        </section>
+        <section>
+            <section data-markdown>
+                ## Dealing With State
+                * Shared Mutability
+                * Isolated Mutability
+                * Pure Immutability
+            </section>
+            <section data-markdown>
+                ## Total Age Of The Group
+                * Every person including myself is a thread (actor)
+            </section>
+            <section data-markdown>
+                ### Shared Mutability - Total Age Of The Group
+                * Algorithm
+                    * I write 0 on the blackboard
+                    * Everyone has to come up and add their age to the current value
+            </section>
+            <section data-markdown>
+                ### Shared Mutability - Total Age Of The Group
+                * Algorithm
+                    * I write 0 on the blackboard
+                    * Everyone has to come up and add their age to the current value
+                * Salient Points
+                    * Watch out for somebody making the wrong calculation
+                    * Line of people waiting for their turn to write their age
+                * Programming Terms
+                    * Safeguard against a rogue thread which will ruin the calculation
+                    * Blocking threads
+                    * High thread safety
+                    * Low concurrency
+            </section>
+            <section data-markdown>
+                ### Isolated Mutability - Total Age Of The Group
+                * Algorithm
+                    * Everybody sends me a text message with their age
+            </section>
+            <section data-markdown>
+                ### Isolated Mutability - Total Age Of The Group
+                * Algorithm
+                    * Everybody sends me a text message with their age
+                * Salient Points
+                    * Senders are concurrent and non-blocking
+                    * The mutable value which is the total age is isolated
+                    * Cell phone carrier took care of the concurrency for me
+                * Programming Terms
+                    * I only get a copy of the message - making `message` immutable
+                    * Values within the actor are isolated and cannot be viewed by other actors
+                    * No need to worry about synchronization
+
+                Note:
+                * Nobody has to wait
+                * Only I hold the value, nobody else has access to that value
+            </section>
+            <section data-markdown>
+                ### Pure Immutability - Total Age Of The Group
+                * Algorithm
+                    * Everyone sits in a circle.
+                    * First person will tell her age to the person sitting on the left.
+                    * Second person will total his age and give new total to the next person and so on.
+            </section>
+            <section data-markdown>
+                ### Pure Immutability - Total Age Of The Group
+                * Salient Points
+                    * Nobody has changed any value.
+                    * Large groups of people can be partitioned into smaller groups (MapReduce approach).
+                * Programming Terms
+                    * Very common in functional languages such as Scala, Clojure, Groovy, and JRuby.
+                    * Different programming paradigm.
+                    * Algorithms need to favor immutability, apply recursive structure / functional composition, and utilize persistent data structures.
+
+                Note:
+                * Nobody has changed any value.
+                * Every person had a new partial total and created a new total.
+                * Old values were discarded.
+                * Cell phone carrier took care of the concurrency for me
+                * Recursion was tough for me.
+            </section>
+            <section data-markdown>
+                ## Dealing With State
+                * How would a wiki page be collaborated?
+                    * Shared Mutability
+                    * Isolated Mutability
+                    * Pure Immutability
+
+                Note:
+                * Single wiki page needs to be collaborated
+                    * Shared Mutability – Single page
+                    * Isolated Mutability – Different sections of the page are given to different people. Section when completed is given to a co-ordinator who will guard the final page.
+                    * Pure Immutability – Single page, but a sequential chain of people are working on the page
+            </section>
+        </section>
+        <section>
+            <section data-markdown>
+                ## Shared Mutability - Memory Barrier
+                * Copying from local / working memory (registers / caches) to main memory
+                    * Write has to happen before the read
+                    * Writing thread has to cross the memory barrier before the reading thread
+                * APIs which force crossing the memory barrier
+                    * `synchronized` / `volatile` keywords force changes to be globally visible
+                    * Methods such as `Thread.start()` and `Threads.interrupt()`
+                    * `ExecutorService`
+                    * `CountdownLatch`
+                    
+                Note: 
+                * Memory Barrier
+                    * Threads from constructors forces memory barrier because start() is called.
+            </section>
+            <section data-markdown>
+                ## Shared Mutability - Concerns
+                * Not restricted to public fields
+                    * Shared variable is accessed, for read or write, by more than one thread.
+                * Common mistakes
+                    * Create threads in static factory methods.
+                    * Don't create threads from within constructors; instead, create them in static factory methods.
+                        * Exposes partially created objects to other threads.
+                    * Don't create arbitrary threads; instead use a pool of threads to reduce the tasks startup time and resource use.
+                    * Ensure that access to mutable fields cross **memory barrier** and are visible to threads properly.
+                    * Evaluate the granularity of locks and promote concurrency to be at the right level.
+                    * When working with multiple mutable fields, verify that the access to these variables is atomic; that is other threads don't see partial changes to these fields.
+                    
+                Note:
+                * Threads from constructors forces memory barrier because start() is called.                
+            </section>
+            <section data-markdown>
+                ## Shared Mutability
+                ### Concerns
+                * Synchronization
+                    * Blocking threads – waiting
+                    * Locks need to be fine grained / granular
+                        * Easy to create deadlock
+                        * Maybe need to retry getting the lock as the operation failed or lock acquisition failed
+                * An alternative approach is to use Software Transactional Memory
+            </section>
+            <section data-markdown>
+                ## Shared Mutability
+                ### Software Transaction Memory
+                * STM provides transactional like facilities
+                * Create transactions around mutating code
+                    * No explicit locks
+                * If no conflicts with other transactions / threads, transaction is completed, committed to memory
+                    * Otherwise, transaction is reverted.
+                * Nested transactions
+                * Read only transactions
+                * Blocking transactions
+                * Commit and rollback
+            </section>
+            <section data-markdown>
+                ## Shared Mutability
+                ### Software Transaction Memory
+                * ACID like properties without the Durability
+                    * Atomicity
+                        * All or none 
+                * Consistency
+                    * Transactions complete till the end. Other transactions will consistently see one change after the other.
+                * Isolation
+                    * Transactions don't see partial changes of other transactions but only after a transaction is completed.
+            </section>
+            <section data-markdown>
+                ## Shared Mutability
+                ### Software Transaction Memory
+                * Lock-free programming model
+                    * No need to worry about lock order
+                * Ok, so what is the problem?
+                    * Suitable only when write collisions are infrequent (like MySql)
+            </section>                
+            <section data-markdown>
+                ## Software Transactional Memory
+                * Memory Barrier - https://www.infoq.com/articles/memory_barriers_jvm_concurrency
+                * https://en.wikipedia.org/wiki/Software_transactional_memory
+                * Libraries
+                    * Multiverse STM
+                        * https://github.com/pveentjer/Multiverse
+            </section>
+        </section>
+        <section>
+            <section data-markdown>
+                ## Isolated Mutability
+                ### Introduction
+                * JDK Threading API
+                * Software Transactional Memory (STM)
+                    * Still painful
+                    * Doesn't manage mutable variables for you
+                * Event-Based Message Passing
+            </section>
+            <section data-markdown>
+                ## Isolated Mutability
+                ### Event-Based Message Passing
+                * Create tasks as lightweight processes
+                * Send immutable messages to the task
+                * Once completed, pass back the result or to other coordinating tasks
+                * Messages
+                    * Asynchronous / Synchronous
+                * `Tasks == Actors`
+                    * `Actors != Threads`
+                    * Actors are scheduled on Threads
+            </section>
+            <section data-markdown>
+                ## Isolated Mutability
+                ### Actors
+                * `numberOf(actors) != numberOf(threads)`
+                * Actor per entity
+                * In-built message queue just like a cell phone
+                * Actor scheduler
+                    * `Threads` are like `Cafeteria Seats`
+                    *  `Actors` are like `Office Employees`                
+            </section>
+            <section data-markdown>
+                ## Isolated Mutability
+                ### Actors
+                * Ensure messages are immutable
+                * Actors run asynchronously but coordinate by passing messages.
+                    * Actor starvation – waiting for messages which never arrive
+                * Actors do not prevent deadlock
+                    * Two actors waiting on one another for messages
+                * Actors can handle one message at a time                
+            </section>
+        </section>
+        <section>
+            <section>
+                <h2>Pure Immutability</h2>
+                <h3>Java Code</h3>
+                <pre>
+                    <code class="hljs"  data-trim data-noescape>
+public static int findMax(List<Integer> temperatures) {
+    int highTemperature = Integer.MIN_VALUE;
+    for (int temperature: temperatures) {
+        highTemperature = Math.max(highTemperature, temperature);
+    }
+    return highTemperature;
+}
+                    </code>
+                </pre>
+            </section>
+            <section>
+                <h2>Pure Immutability<h2>
+                <h3>Scala Code</h3>
+                <pre>
+                    <code data-trim data-noescape>
+def findMax(temperatures: List[Int]) = {
+  temperatures.foldLeft(Integer.MIN_VALUE)((min, x) => {
+    Math.max(min, x)
+  })
+}
+                    </code>
+                </pre>
+            </section>
+            <section data-markdown>
+                ## Pure Immutability
+                ### Scala Code
+                <pre>
+                    <code data-trim data-noescape>
+                        def findMax(temperatures: List[Int]) = {
+                          temperatures.foldLeft(Integer.MIN_VALUE)((min, x) => {
+                            Math.max(min, x)
+                          })
+                        }
+
+                        def findMax(temperatures: List[Int]) = temperatures.foldLeft(Integer.MIN_VALUE)(Math.max)
+                    </code>
+                </pre>
+
+                Note:
+                * No semicolons, no parenthesis-es
+                * Return data type is inferred
+                * `temperatures` can't be reassigned. It's immutable.
+            </section>
+            <section data-markdown>
+                ## Pure Immutability
+                ### Scala Code
+                <pre>
+                    <code data-trim data-noescape>
+                        val departments: Seq[Department] = ...
+
+                        departments
+                          .flatMap(_.employees)
+                          .filter(_.birthday == today)
+                          .zipWith(randomBirthdayCardTemplates)
+                          .map(personalizeCard)
+                          .grouped(16)
+                          .foreach(sendCardBatch)
+                    </code>
+                </pre>
+
+                Reference: http://swave.io/scalar/#/3
+            </section>
+        </section>
+        <section data-markdown>
+            ## Recap
+            * Introduction
+            * Traditional Concurrency Model
+                * Pitfalls of Traditional Concurrency Model
+                * Updated JDK API
+            * Dealing with state	
+                * Shared Mutability
+                    * Software Transactional Memory
+                * Isolated Mutability
+                    * Actor model
+                * Pure Immutability            
+        </section>
+        <section>
+            <section data-markdown>
+                ## Resources
+                * Books
+                    * This presentation is a summary of this book:
+                        *Programming Concurrency on the JVM* by Venkat Subramaniam
+                    * *Programming Erlang: Software for a Concurrent World* by Joe Armstrong
+                    * *Effective Java* by Joshua Bloch
+                * Classic Books on Concurrency
+                    * *Java Concurrency in Practice* by Brian Goetz
+                    * *Concurrent Programming in Java: Design Principles and Patterns* by Doug Lea
+            </section>
+            <section data-markdown>
+                ## Resources
+                * Web Articles
+                    * Identity vs. State
+                        * http://clojure.org/state
+                    * Java Specification
+                        * http://docs.oracle.com/javase/specs/ - Chapter 17. Threads and Locks
+                    * https://deanwampler.github.io/polyglotprogramming/
+            </section>
+            <section data-markdown>
+                ## Resources
+                * Languages
+                    * Scala
+                        * Functional language which supports immutable data structures
+                        * http://www.scalakoans.org/
+                    * Clojure
+                        * Software Transactional Memory is baked into the language
+            </section>
+            <section data-markdown>
+                ## Resources
+                * Frameworks
+                    * Akka
+                        * Actor model written in Scala and can be used within Java
+                        * Activator Templates - https://www.lightbend.com/activator/download
+                    * Multiverse (STM for Java)
+                        * http://multiverse.codehaus.org/overview.html
+            </section>
+        </section>
+    </div>
+</div>
+<script src="lib/js/head.min.js"></script>
+<script src="js/reveal.js"></script>
+
+<script>
+
+    // More info https://github.com/hakimel/reveal.js#configuration
+    Reveal.initialize({
+        controls: true,
+        progress: false,
+        history: true,
+        center: true,
+        width: 1500,
+        height: 900,
+        margin: 0.1,
+        minScale: 0.01,
+        maxScale: 1.5,
+
+        transition: 'slide', // none/fade/slide/convex/concave/zoom
+
+        // More info https://github.com/hakimel/reveal.js#dependencies
+        dependencies: [
+            {
+                src: 'lib/js/classList.js', condition: function () {
+                return !document.body.classList;
+            }
+            },
+            {
+                src: 'plugin/markdown/marked.js', condition: function () {
+                return !!document.querySelector('[data-markdown]');
+            }
+            },
+            {
+                src: 'plugin/markdown/markdown.js', condition: function () {
+                return !!document.querySelector('[data-markdown]');
+            }
+            },
+            {
+                src: 'plugin/highlight/highlight.js', async: true, callback: function () {
+                hljs.initHighlightingOnLoad();
+            }
+            },
+            {src: 'plugin/zoom-js/zoom.js', async: true},
+            {src: 'plugin/notes/notes.js', async: true},
+            {src: 'socket.io/socket.io.js', async: true},
+            {src: 'plugin/notes-server/client.js', async: true}
+        ]
+    });
+</script>
+</body>
+</html>
