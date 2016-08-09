@@ -1,0 +1,283 @@
+<html>
+<head>
+    <meta charset="utf-8">
+
+    <title>Ansible - Deployments Made Easy</title>
+
+    <meta name="description" content="Ansible">
+    <meta name="author" content="Siva Kommuri">
+
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <link rel="stylesheet" href="css/reveal.css">
+    <link rel="stylesheet" href="css/theme/black.css" id="theme">
+
+    <link rel="stylesheet" href="css/reveal.css">
+    <link rel="stylesheet" href="css/theme/moon.css">
+    <!-- Theme used for syntax highlighting of code -->
+    <link rel="stylesheet" href="lib/css/zenburn.css">
+
+    <!-- Printing and PDF exports -->
+    <script>
+        var link = document.createElement( 'link' );
+        link.rel = 'stylesheet';
+        link.type = 'text/css';
+        link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+        document.getElementsByTagName( 'head' )[0].appendChild( link );
+    </script>
+
+    <!--[if lt IE 9]>
+    <script src="lib/js/html5shiv.js"></script>
+    <![endif]-->
+</head>
+<body>
+<div class="reveal">
+    <div class="slides">
+        <section data-markdown>
+            ## Ansible
+            ### Deployments Made Easy!
+            #### Siva Kommuri / August 9, 2016
+        </section>
+        <section data-markdown>
+            ## Overview
+            * Introduction
+            * Anatomy
+            * Resources
+            * Questions
+
+            Note:
+            * notes
+        </section>
+        <section data-markdown>
+            ## Introduction
+            1. Existing Players
+                1. Puppet
+                1. Chef
+                1. Salt
+                1. Ansible
+                1. CFEngine
+
+            Note:
+            1. Flame wars!
+            1. adhoc commands - agent/master - Push vs Pull - apply
+            1. Chef , Puppet, Salt
+                1. chef and puppet - large enterprises - may require learning ruby
+                1. puppet dsl and chef is almost ruby
+                1. maybe that's what makes it difficult to pick it up - learning a new language
+            1. ansible and saltstack is fast and simple
+            1. cfengine written in c
+        </section>
+        <section>
+            <section data-markdown>
+                ## Introduction
+                1. Core technologies - Python, YAML
+                1. Templating engine - Jinja2
+                1. Mechanism - SSH
+                1. Idempotent
+                    * Fact gathering - only change if necessary
+                    * Only if there are no bash scripts
+                1. Dry run
+                1. Tasks - Start in the middle - step through the tasks
+            </section>
+            <section data-markdown>
+                ## Introduction
+                1. Idempotent
+                    * Fact gathering - only change if necessary
+                    * Only if there are no bash scripts
+                1. Dry run
+                1. Tasks - Start in the middle - step through the tasks
+            </section>
+        </section>
+        <section data-markdown>
+            ## Anatomy
+            1. Inventory
+            1. Playbooks
+            1. Tasks
+            1. Modules
+            1. Handlers
+            1. Roles
+
+            Note:
+            * Modules - apt module
+        </section>
+        <section data-markdown>
+            ## Anatomy
+            ### Inventory
+
+            ```
+            [webservers]
+            host1
+            host2
+
+            [databases]
+            db-[a:f].example.com
+
+
+            [production:children]
+            webservers
+            databases
+            ```
+
+            Note:
+            * Dynamic Inventory
+        </section>
+        <section data-markdown>
+            ## Anatomy
+            ### Playbook
+
+            ```
+            ---
+            - hosts: local
+              tasks:
+               - name: Install Nginx
+                 apt: pkg=nginx state=installed update_cache=true
+            ```
+
+            Note:
+            * Tasks
+            * Modules
+            * Loops and Conditionals as well!
+        </section>
+        <section data-markdown>
+            ## Anatomy
+            ### Handlers
+
+            ```
+            ---
+            - hosts: local
+              tasks:
+               - name: Install Nginx
+                 apt: pkg=nginx state=installed update_cache=true
+                 notify:
+                  - Start Nginx
+
+              handlers:
+               - name: Start Nginx
+                 service: name=nginx state=started
+            ```
+
+            Note:
+            * Notified by notifiers
+            * Like tasks but only executed once after all tasks in a playbook are completed
+        </section>
+        <section>
+            <section data-markdown>
+                ## Anatomy
+                ### Roles
+                1. Roles organize multiple related tasks, and data.
+            </section>
+            <section data-markdown>
+                ## Anatomy
+                ### Roles - Structure
+
+                ```
+                rolename
+                - files
+                - handlers
+                - meta
+                - templates
+                - tasks
+                - vars
+                ```
+
+                Note:
+                * files - needed to copy to the server
+                * meta - declare dependencies
+                * templates - jinja2
+            </section>
+        </section>
+        <section data-markdown>
+            ## Anatomy
+            ### Vault
+
+            * Store sensitive data
+
+            Note:
+            * Will prompt the user for password
+        </section>
+        <section data-markdown>
+            ## Anatomy - Wrapup
+            1. Inventory
+            1. Playbooks
+            1. Tasks
+            1. Modules
+            1. Handlers
+            1. Roles
+
+            Note:
+            * Modules - apt module
+        </section>
+        <section data-markdown>
+            ## Repos
+            * [ansible-playground](http://mod.lge.com/code/projects/FIM/repos/ansible-playground/browse)
+            * [A4-ansible-playbooks](http://mod.lge.com/code/projects/FIM/repos/a4-ansible-playbooks/browse)
+        </section>
+        <section data-markdown>
+            ## Jenkins Job
+            * Version 1.0 - [Signage-User](http://10.195.249.21:8080/view/Signage/job/Signage-User/)
+            * Version 2.0 - [Life-Life](http://10.195.249.21:8080/view/Life/job/Life-Life/)
+        </section>
+        <section data-markdown>
+            ## Resources
+            * [Ansible Documentation](http://docs.ansible.com/ansible/)
+            * [Servers For Hackers - An Ansible Tutorial](https://serversforhackers.com/an-ansible-tutorial)
+            * [Vagrant / Docker] - https://github.com/neowulf33/docker-sbt
+            * [Deployment Management Tools: Chef vs. Puppet vs. Ansible vs. SaltStack vs. Fabric](http://blog.takipi.com/deployment-management-tools-chef-vs-puppet-vs-ansible-vs-saltstack-vs-fabric/)
+            * [Yet Another Puppet vs Chef vs Ansible vs Salt Topic](http://www.emir.works/configuration-management-battlefield/)
+        </section>
+    </div>
+</div>
+
+<script src="lib/js/head.min.js"></script>
+<script src="js/reveal.js"></script>
+
+<script>
+
+    // More info https://github.com/hakimel/reveal.js#configuration
+    Reveal.initialize({
+        controls: true,
+        progress: false,
+        history: true,
+        center: true,
+        width: 1500,
+        height: 900,
+        margin: 0.1,
+        minScale: 0.01,
+        maxScale: 1.5,
+
+        transition: 'slide', // none/fade/slide/convex/concave/zoom
+
+        // More info https://github.com/hakimel/reveal.js#dependencies
+        dependencies: [
+            {
+                src: 'lib/js/classList.js', condition: function () {
+                return !document.body.classList;
+            }
+            },
+            {
+                src: 'plugin/markdown/marked.js', condition: function () {
+                return !!document.querySelector('[data-markdown]');
+            }
+            },
+            {
+                src: 'plugin/markdown/markdown.js', condition: function () {
+                return !!document.querySelector('[data-markdown]');
+            }
+            },
+            {
+                src: 'plugin/highlight/highlight.js', async: true, callback: function () {
+                hljs.initHighlightingOnLoad();
+            }
+            },
+            {src: 'plugin/zoom-js/zoom.js', async: true},
+            {src: 'plugin/notes/notes.js', async: true},
+            {src: 'socket.io/socket.io.js', async: true},
+            {src: 'plugin/notes-server/client.js', async: true}
+        ]
+    });
+</script>
+</body>
+</html>
