@@ -43,24 +43,24 @@
         </section>
         <section data-markdown>
             ## Overview
-            * Introduction
+            * Existing Players
+            * Ansible
             * Anatomy
             * Resources
-            * Questions
 
             Note:
             * notes
         </section>
         <section data-markdown>
-            ## Introduction
-            1. Existing Players
-                1. Puppet
-                1. Chef
-                1. Salt
-                1. Ansible
-                1. CFEngine
+            ## Existing Players
+            1. Puppet
+            1. Chef
+            1. Salt
+            1. Ansible
+            1. CFEngine
 
             Note:
+            1. Thoughts? Experiences?
             1. Flame wars!
             1. adhoc commands - agent/master - Push vs Pull - apply
             1. Chef , Puppet, Salt
@@ -72,102 +72,107 @@
         </section>
         <section>
             <section data-markdown>
-                ## Introduction
-                1. Core technologies - Python, YAML
-                1. Templating engine - Jinja2
-                1. Mechanism - SSH
-                1. Idempotent
-                    * Fact gathering - only change if necessary
-                    * Only if there are no bash scripts
-                1. Dry run
-                1. Tasks - Start in the middle - step through the tasks
+                ## Ansible
+                1. Core technologies
+                    * Python
+                    * YAML
+                1. Templating engine
+                    * Jinja2
+                1. Mechanism
+                    * SSH
             </section>
             <section data-markdown>
-                ## Introduction
+                ## Ansible
                 1. Idempotent
                     * Fact gathering - only change if necessary
                     * Only if there are no bash scripts
+                    * Declare facts!
                 1. Dry run
-                1. Tasks - Start in the middle - step through the tasks
+                1. Tasks
+                    * Start anywhere
+                    * Step through
             </section>
-        </section>
-        <section data-markdown>
-            ## Anatomy
-            1. Inventory
-            1. Playbooks
-            1. Tasks
-            1. Modules
-            1. Handlers
-            1. Roles
-
-            Note:
-            * Modules - apt module
-        </section>
-        <section data-markdown>
-            ## Anatomy
-            ### Inventory
-
-            ```
-            [webservers]
-            host1
-            host2
-
-            [databases]
-            db-[a:f].example.com
-
-
-            [production:children]
-            webservers
-            databases
-            ```
-
-            Note:
-            * Dynamic Inventory
-        </section>
-        <section data-markdown>
-            ## Anatomy
-            ### Playbook
-
-            ```
-            ---
-            - hosts: local
-              tasks:
-               - name: Install Nginx
-                 apt: pkg=nginx state=installed update_cache=true
-            ```
-
-            Note:
-            * Tasks
-            * Modules
-            * Loops and Conditionals as well!
-        </section>
-        <section data-markdown>
-            ## Anatomy
-            ### Handlers
-
-            ```
-            ---
-            - hosts: local
-              tasks:
-               - name: Install Nginx
-                 apt: pkg=nginx state=installed update_cache=true
-                 notify:
-                  - Start Nginx
-
-              handlers:
-               - name: Start Nginx
-                 service: name=nginx state=started
-            ```
-
-            Note:
-            * Notified by notifiers
-            * Like tasks but only executed once after all tasks in a playbook are completed
         </section>
         <section>
             <section data-markdown>
                 ## Anatomy
+                1. Inventory
+                1. Playbooks
+                1. Tasks
+                1. Modules
+                1. Handlers
+                1. Roles
+
+                Note:
+                * Modules - apt module
+            </section>
+            <section data-markdown>
+                ## Anatomy
+                ### Inventory
+
+                ```
+                [webservers]
+                host1
+                host2
+
+                [databases]
+                db-[a:f].example.com
+
+                [production:children]
+                webservers
+                databases
+                ```
+
+                Note:
+                * Dynamic Inventory
+            </section>
+            <section data-markdown>
+                ## Anatomy
+                ### Playbook, Tasks and Modules
+
+                ```
+                ---
+                - hosts: local
+                  tasks:
+                   - name: Install Nginx
+                     apt: pkg=nginx state=installed update_cache=true
+                ```
+
+                Note:
+                * Tasks
+                * Modules
+                    * Copy files
+                    * Execute scripts
+                    * System modules - run puppet agent!
+                * Loops and Conditionals as well!
+            </section>
+            <section data-markdown>
+                ## Anatomy
+                ### Handlers
+
+                ```
+                ---
+                - hosts: local
+                  tasks:
+                   - name: Install Nginx
+                     apt: pkg=nginx state=installed update_cache=true
+                     notify:
+                      - Start Nginx
+
+                  handlers:
+                   - name: Start Nginx
+                     service: name=nginx state=started
+                ```
+
+                Note:
+                * Special tasks
+                * Executed once after all tasks in a playbook are completed
+                * Notified by notifiers
+            </section>
+            <section data-markdown>
+                ## Anatomy
                 ### Roles
-                1. Roles organize multiple related tasks, and data.
+                Roles organize multiple related tasks and data.
             </section>
             <section data-markdown>
                 ## Anatomy
@@ -188,45 +193,51 @@
                 * meta - declare dependencies
                 * templates - jinja2
             </section>
-        </section>
-        <section data-markdown>
-            ## Anatomy
-            ### Vault
+            <section data-markdown>
+                ## Anatomy
+                ### Vault
 
-            * Store sensitive data
+                * Store sensitive data
 
-            Note:
-            * Will prompt the user for password
-        </section>
-        <section data-markdown>
-            ## Anatomy - Wrapup
-            1. Inventory
-            1. Playbooks
-            1. Tasks
-            1. Modules
-            1. Handlers
-            1. Roles
+                Note:
+                * Will prompt the user for password
+            </section>
+            <section data-markdown>
+                ## Anatomy - Wrapup
+                1. Inventory
+                1. Playbooks
+                1. Tasks
+                1. Modules
+                1. Handlers
+                1. Roles
 
-            Note:
-            * Modules - apt module
+                Note:
+                * Modules - apt module
+            </section>
         </section>
-        <section data-markdown>
-            ## Repos
-            * [ansible-playground](http://mod.lge.com/code/projects/FIM/repos/ansible-playground/browse)
-            * [A4-ansible-playbooks](http://mod.lge.com/code/projects/FIM/repos/a4-ansible-playbooks/browse)
+        <section>
+            <section data-markdown>
+                ## Resources
+                ### Repos
+                * [ansible-playground](http://mod.lge.com/code/projects/FIM/repos/ansible-playground/browse)
+                * [A4-ansible-playbooks](http://mod.lge.com/code/projects/FIM/repos/a4-ansible-playbooks/browse)
+            </section>
+            <section data-markdown>
+                ## Resources
+                ### Jenkins Job
+                * Version 1.0 - [Signage-User](http://10.195.249.21:8080/view/Signage/job/Signage-User/)
+                * Version 2.0 - [Life-Life](http://10.195.249.21:8080/view/Life/job/Life-Life/)
+            </section>
+            <section data-markdown>
+                ## Resources
+                * [Ansible Documentation](http://docs.ansible.com/ansible/)
+                * [Servers For Hackers - An Ansible Tutorial](https://serversforhackers.com/an-ansible-tutorial)
+                * [Vagrant / Docker](https://github.com/neowulf33/docker-sbt)
+                * [Deployment Management Tools: Chef vs. Puppet vs. Ansible vs. SaltStack vs. Fabric](http://blog.takipi.com/deployment-management-tools-chef-vs-puppet-vs-ansible-vs-saltstack-vs-fabric/)
+                * [Yet Another Puppet vs Chef vs Ansible vs Salt Topic](http://www.emir.works/configuration-management-battlefield/)
+            </section>
         </section>
-        <section data-markdown>
-            ## Jenkins Job
-            * Version 1.0 - [Signage-User](http://10.195.249.21:8080/view/Signage/job/Signage-User/)
-            * Version 2.0 - [Life-Life](http://10.195.249.21:8080/view/Life/job/Life-Life/)
-        </section>
-        <section data-markdown>
-            ## Resources
-            * [Ansible Documentation](http://docs.ansible.com/ansible/)
-            * [Servers For Hackers - An Ansible Tutorial](https://serversforhackers.com/an-ansible-tutorial)
-            * [Vagrant / Docker] - https://github.com/neowulf33/docker-sbt
-            * [Deployment Management Tools: Chef vs. Puppet vs. Ansible vs. SaltStack vs. Fabric](http://blog.takipi.com/deployment-management-tools-chef-vs-puppet-vs-ansible-vs-saltstack-vs-fabric/)
-            * [Yet Another Puppet vs Chef vs Ansible vs Salt Topic](http://www.emir.works/configuration-management-battlefield/)
+        <section data-background-image="/lib/img/thats_all_folks.jpg">
         </section>
     </div>
 </div>
